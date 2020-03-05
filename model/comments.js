@@ -1,8 +1,9 @@
 const connection = require("../connection");
 
 exports.patchCommentVotesByID = (comment_id, votes) => {
+  if (votes.inc_votes == undefined) votes.inc_votes = 0;
   if (
-    Object.keys(votes).length != 1 ||
+    Object.keys(votes).length > 1 ||
     Number.isInteger(votes.inc_votes) === false
   ) {
     return Promise.reject({ status: 400, msg: "Bad Request" });

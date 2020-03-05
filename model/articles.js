@@ -2,6 +2,7 @@ const connection = require("../connection");
 
 exports.selectArticleByID = article_id => {
   return connection("articles")
+    .select("articles.*")
     .count("comments.comment_id AS comment_count")
     .leftJoin("comments", "articles.article_id", "=", "comments.article_id")
     .where("articles.article_id", "=", article_id)
@@ -9,28 +10,19 @@ exports.selectArticleByID = article_id => {
     .then(([article]) => {
       if (!article) {
         return Promise.reject({
-          status: 404,
-          msg: "ID Does Not Exist"
+          status: 422,
+          msg: "Article ID Does Not Exist"
         });
-      } else article.comment_count = Number(article.comment_count);
-      return connection("articles")
-        .select("*")
-        .where("article_id ", "=", article_id)
-        .returning("*")
-        .then(rows => {
-          let newArticle = rows.map(row => {
-            const newObject = { ...row };
-            newObject.comment_count = article.comment_count;
-            return newObject;
-          });
-          return newArticle[0];
-        });
+      }
+      return article;
     });
 };
 
 exports.patchVoteByID = (article_id, votes) => {
+  if (votes.inc_votes == undefined) votes.inc_votes = 0;
+
   if (
-    Object.keys(votes).length != 1 ||
+    Object.keys(votes).length > 1 ||
     Number.isInteger(votes.inc_votes) === false
   ) {
     return Promise.reject({ status: 400, msg: "Bad Request" });
@@ -40,7 +32,7 @@ exports.patchVoteByID = (article_id, votes) => {
       .then(([rows]) => {
         if (!rows) {
           return Promise.reject({
-            status: 404,
+            status: 422,
             msg: "ID Does Not Exist"
           });
         } else {
@@ -53,10 +45,8 @@ exports.patchVoteByID = (article_id, votes) => {
                 let newPatchObj = { ...row };
                 let newTally = newPatchObj.votes + votes.inc_votes;
                 newPatchObj.votes = newTally;
-
                 return newPatchObj;
               });
-
               return updateArray[0];
             });
         }
@@ -70,6 +60,11 @@ exports.postCommentByID = (article_id, comment) => {
   newCommentObj.author = comment.username;
   newCommentObj.body = comment.body;
   newCommentObj.article_id = article_id;
+  // to be done for good id that does not yet exist
+  // return Promise.reject({
+  //   status: 422,
+  //   msg: "ID Does Not Exist"
+  // });
 
   return connection("comments")
     .insert(newCommentObj)
