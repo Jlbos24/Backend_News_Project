@@ -37,31 +37,15 @@ exports.patchCommentVotesByID = (comment_id, votes) => {
 };
 
 exports.delete_CommentByID = comment_id => {
-  console.log(comment_id);
   return connection("comments")
-    .select("*")
     .where("comment_id", "=", comment_id)
-    .then(result => {
-      if (result.length < 1) {
+    .del()
+    .then(delCount => {
+      if (delCount === 0) {
         return Promise.reject({
           status: 422,
-          msg: "Delete Unsuccessful - ID not found"
+          msg: "Delete Unsuccessful - ID Not Found"
         });
-      } else return result;
-    })
-    .then(result => {
-      return connection
-        .from("comments")
-        .where("comment_id", "=", comment_id)
-        .del();
-    })
-    .then(row => {
-      return connection
-        .select("*")
-        .from("comments")
-        .where("comment_id", "=", comment_id)
-        .then(row => {
-          return row;
-        });
+      }
     });
 };

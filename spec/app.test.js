@@ -13,7 +13,7 @@ describe("/api", () => {
   beforeEach(() => connection.seed.run());
   describe("/topics", () => {
     describe("GET", () => {
-      it("Status 200: Return a topic with passed request", () => {
+      it("Status: 200 Return a topic with passed request", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
@@ -22,7 +22,7 @@ describe("/api", () => {
             expect(res.body.topics[0]).to.contain.keys("slug", "description");
           });
       });
-      it("Status 404: Path Not Found for Get Request", () => {
+      it("Status: 404 Path Not Found for Get Request", () => {
         return request(app)
           .get("/api/topics/invalid")
           .expect(404)
@@ -31,10 +31,24 @@ describe("/api", () => {
           });
       });
     });
+    describe("INVALID METHOD", () => {
+      it("Status: 405 Invalid Method", () => {
+        const invalidMethods = ["delete", "patch", "put", "post"];
+        const promiseArray = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/topics")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Method Not Allowed");
+            });
+        });
+        return Promise.all(promiseArray);
+      });
+    });
   });
   describe("/users", () => {
     describe("GET", () => {
-      it("Status 200: Get Request responds with a selected user when passed a username", () => {
+      it("Status: 200 Get Request responds with a selected user when passed a username", () => {
         return request(app)
           .get("/api/users/butter_bridge")
           .expect(200)
@@ -47,7 +61,7 @@ describe("/api", () => {
             );
           });
       });
-      it("Status 404: Invalid Username", () => {
+      it("Status: 404 Invalid Username", () => {
         return request(app)
           .get("/api/users/invalid_username")
           .expect(404)
@@ -56,11 +70,25 @@ describe("/api", () => {
           });
       });
     });
+    describe("INVALID METHOD", () => {
+      it("Status: 405 Invalid Method", () => {
+        const invalidMethods = ["delete", "patch", "put", "post"];
+        const promiseArray = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/users/:username")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Method Not Allowed");
+            });
+        });
+        return Promise.all(promiseArray);
+      });
+    });
   });
 
   describe("/articles", () => {
     describe("GET", () => {
-      it("Status 200 - Returns an array of article objects", () => {
+      it("Status: 200 - Returns an array of article objects", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -87,7 +115,7 @@ describe("/api", () => {
             });
           });
       });
-      it("status: 200 - Sort by created_at as default", () => {
+      it("Status: 200 - Sort by created_at as default", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -95,7 +123,7 @@ describe("/api", () => {
             expect(res.body.articles).to.be.sorted("created_at");
           });
       });
-      it("status: 200 - Sort Descending", () => {
+      it("Status: 200 - Sort Descending", () => {
         return request(app)
           .get("/api/articles?order=desc")
           .expect(200)
@@ -103,7 +131,7 @@ describe("/api", () => {
             expect(res.body.articles).to.be.descending;
           });
       });
-      it("status: 200 - Sort by votes Descending", () => {
+      it("Status: 200 - Sort by votes Descending", () => {
         return request(app)
           .get("/api/articles?sort_by=votes&order=desc")
           .expect(200)
@@ -111,7 +139,7 @@ describe("/api", () => {
             expect(res.body.articles).to.be.descendingBy("votes");
           });
       });
-      it("status: 200 - Sort Ascending", () => {
+      it("Status: 200 - Sort Ascending", () => {
         return request(app)
           .get("/api/articles?order=asc")
           .expect(200)
@@ -119,7 +147,7 @@ describe("/api", () => {
             expect(res.body.articles).to.be.ascending;
           });
       });
-      it("status: 200 - Filter by Author", () => {
+      it("Status: 200 - Filter by Author", () => {
         return request(app)
           .get("/api/articles?author=rogersop")
           .expect(200)
@@ -127,7 +155,7 @@ describe("/api", () => {
             expect(res.body.articles.length).to.eql(3);
           });
       });
-      it("status: 200 - Filter by Topic", () => {
+      it("Status: 200 - Filter by Topic", () => {
         return request(app)
           .get("/api/articles?topic=mitch")
           .expect(200)
@@ -135,7 +163,7 @@ describe("/api", () => {
             expect(res.body.articles.length).to.eql(11);
           });
       });
-      xit("status: 400 - Sort By Column Doesnt Exist sort_by = 'house_name etc - this in model", () => {
+      xit("Status: 400 - Sort By Column Doesnt Exist sort_by = 'house_name etc - this in model", () => {
         return request(app)
           .get("/api/articles?topic=mitch")
           .expect(200)
@@ -143,10 +171,24 @@ describe("/api", () => {
             expect(res.body.articles.length).to.eql(12);
           });
       });
+      describe("INVALID METHOD", () => {
+        it("Status: 405 Invalid Method", () => {
+          const invalidMethods = ["delete", "patch", "put", "post"];
+          const promiseArray = invalidMethods.map(method => {
+            return request(app)
+              [method]("/api/articles")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Method Not Allowed");
+              });
+          });
+          return Promise.all(promiseArray);
+        });
+      });
     });
     describe("/:articles_id", () => {
       describe("GET", () => {
-        it("Status 200: Get Request responds with articles object", () => {
+        it("Status: 200 Get Request responds with articles object", () => {
           return request(app)
             .get("/api/articles/1")
             .expect(200)
@@ -174,7 +216,7 @@ describe("/api", () => {
               });
             });
         });
-        it("Status 400: Invalid Username - Bad Article_ID", () => {
+        it("Status: 400 Invalid Username - Bad Article_ID", () => {
           return request(app)
             .get("/api/articles/animal")
             .expect(400)
@@ -182,7 +224,7 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status 404: Invalid Username - Good Article ID - Does Not Exist", () => {
+        it("Status: 404 Invalid Username - Good Article ID - Does Not Exist", () => {
           return request(app)
             .get("/api/articles/99999")
             .expect(404)
@@ -192,7 +234,7 @@ describe("/api", () => {
         });
       });
       describe("Patch", () => {
-        it("Status 200 - Decrement votes", () => {
+        it("Status: 200 Decrement votes", () => {
           return request(app)
             .patch("/api/articles/1")
             .send({ inc_votes: -50 })
@@ -211,7 +253,7 @@ describe("/api", () => {
               });
             });
         });
-        it("Status 200 - Increment votes", () => {
+        it("Status: 200 Increment votes", () => {
           return request(app)
             .patch("/api/articles/1")
             .send({ inc_votes: 50 })
@@ -230,7 +272,7 @@ describe("/api", () => {
               });
             });
         });
-        it("Status 400: Invalid Article ID - Bad Article_ID", () => {
+        it("Status: 400 Invalid Article ID - Bad Article_ID", () => {
           return request(app)
             .patch("/api/articles/animal")
             .send({ inc_votes: -50 })
@@ -239,7 +281,7 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status 404: Invalid Article ID - Good Article ID - Does Not Exist", () => {
+        it("Status: 404 Invalid Article ID - Good Article ID - Does Not Exist", () => {
           return request(app)
             .patch("/api/articles/99999")
             .send({ inc_votes: -50 })
@@ -248,7 +290,7 @@ describe("/api", () => {
               expect(msg).to.equal("ID Does Not Exist");
             });
         });
-        it("Status 400 : No inc_votes passed", () => {
+        it("Status: 400 No inc_votes passed", () => {
           return request(app)
             .patch("/api/articles/1")
             .send()
@@ -257,7 +299,7 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status 400 : Incorrect data type", () => {
+        it("Status: 400 Incorrect data type", () => {
           return request(app)
             .patch("/api/articles/1")
             .send({ inc_votes: "cat" })
@@ -266,7 +308,7 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status 400 : Incorrect key/value pairs for inc_votes", () => {
+        it("Status: 400 Incorrect key/value pairs for inc_votes", () => {
           return request(app)
             .patch("/api/articles/1")
             .send({ inc_votes: 1, name: "Mitch" })
@@ -274,6 +316,20 @@ describe("/api", () => {
             .then(({ body: { msg } }) => {
               expect(msg).to.equal("Bad Request");
             });
+        });
+      });
+      describe("INVALID METHOD", () => {
+        it("Status: 405 Invalid Method", () => {
+          const invalidMethods = ["delete", "put", "post"];
+          const promiseArray = invalidMethods.map(method => {
+            return request(app)
+              [method]("/api/articles/:articles_id")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Method Not Allowed");
+              });
+          });
+          return Promise.all(promiseArray);
         });
       });
     });
@@ -302,8 +358,8 @@ describe("/api", () => {
               );
             });
         });
-        xit("Status - to be done for invalid ids", () => {});
-        it("Status 400 : No data passed in body", () => {
+        xit("Status: - to be done for invalid ids", () => {});
+        it("Status: 400 No data passed in body", () => {
           return request(app)
             .post("/api/articles/1/comments")
             .send()
@@ -312,7 +368,7 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status 400 : When Passed Missing Key/Value Pair", () => {
+        it("Status: 400 When Passed Missing Key/Value Pair", () => {
           return request(app)
             .post("/api/articles/1/comments")
             .send({
@@ -323,7 +379,7 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status 400 : Incorrect data types passed in body", () => {
+        it("Status: 400 Incorrect data types passed in body", () => {
           return request(app)
             .post("/api/articles/1/comments")
             .send({
@@ -335,7 +391,7 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status 400 : Incorrect Keys Passed from Client", () => {
+        it("Status: 400 Incorrect Keys Passed from Client", () => {
           return request(app)
             .post("/api/articles/1/comments")
             .send({
@@ -423,13 +479,27 @@ describe("/api", () => {
         });
         xit("WHAT OTHER TESTS FOR THIS?", () => {});
       });
+      describe("INVALID METHOD", () => {
+        it("Statu: 405 Invalid Method", () => {
+          const invalidMethods = ["delete", "patch"];
+          const promiseArray = invalidMethods.map(method => {
+            return request(app)
+              [method]("/api/articles/:articles_id/comments")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Method Not Allowed");
+              });
+          });
+          return Promise.all(promiseArray);
+        });
+      });
     });
   });
 
   describe("/comments", () => {
     describe("/:comment_id", () => {
       describe("PATCH", () => {
-        it("Status 200 - Increment votes", () => {
+        it("Status: 200 Increment votes", () => {
           return request(app)
             .patch("/api/comments/1")
             .send({ inc_votes: 50 })
@@ -448,7 +518,7 @@ describe("/api", () => {
               });
             });
         });
-        it("Status 200 - Decrement votes", () => {
+        it("Status: 200 Decrement votes", () => {
           return request(app)
             .patch("/api/comments/1")
             .send({ inc_votes: -10 })
@@ -467,7 +537,7 @@ describe("/api", () => {
               });
             });
         });
-        it("Status 400: Invalid Article ID - Bad Article_ID", () => {
+        it("Status: 400 Invalid Article ID - Bad Article_ID", () => {
           return request(app)
             .patch("/api/comments/animal")
             .send({ inc_votes: -50 })
@@ -476,7 +546,7 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status 404: Invalid Article ID - Good Article ID - Does Not Exist", () => {
+        it("Status: 404 Invalid Article ID - Good Article ID - Does Not Exist", () => {
           return request(app)
             .patch("/api/comments/99999")
             .send({ inc_votes: -50 })
@@ -485,7 +555,7 @@ describe("/api", () => {
               expect(msg).to.equal("ID Does Not Exist");
             });
         });
-        it("Status 400 : No inc_votes passed", () => {
+        it("Status: 400 No inc_votes passed", () => {
           return request(app)
             .patch("/api/comments/1")
             .send()
@@ -494,7 +564,7 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status 400 : Incorrect data type", () => {
+        it("Status: 400 Incorrect data type", () => {
           return request(app)
             .patch("/api/comments/1")
             .send({ inc_votes: "cat" })
@@ -503,7 +573,7 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status 400 : Incorrect key/value pairs for inc_votes", () => {
+        it("Status: 400 Incorrect key/value pairs for inc_votes", () => {
           return request(app)
             .patch("/api/comments/1")
             .send({ inc_votes: 1, name: "Mitch" })
@@ -514,20 +584,20 @@ describe("/api", () => {
         });
       });
       describe("DELETE", () => {
-        it("status:204 no content for successful deletion", () => {
+        it("Status: 204 No content for successful deletion", () => {
           return request(app)
             .delete("/api/comments/1")
             .expect(204);
         });
-        it("Status 404: Treasure ID does not exist", () => {
+        it("Status: 404 Comment ID does not exist", () => {
           return request(app)
             .delete("/api/comments/9999")
             .expect(422)
             .then(({ body: { msg } }) => {
-              expect(msg).to.eql("Delete Unsuccessful - ID not found");
+              expect(msg).to.eql("Delete Unsuccessful - ID Not Found");
             });
         });
-        it("Status 400: Invalid Data Type on Path", () => {
+        it("Status: 400 Invalid Data Type on Path", () => {
           return request(app)
             .delete("/api/comments/Invalid_string")
             .expect(400)
@@ -536,39 +606,22 @@ describe("/api", () => {
             });
         });
       });
+      describe("INVALID METHOD", () => {
+        it("Status: 405 Invalid Method", () => {
+          const invalidMethods = ["get", "post"];
+          const promiseArray = invalidMethods.map(method => {
+            return request(app)
+              [method]("/api/comments/:comment_id")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Method Not Allowed");
+              });
+          });
+          return Promise.all(promiseArray);
+        });
+      });
     });
   });
 
   after(() => connection.destroy());
 });
-
-// describe("INVALID METHOD", () => {
-//   it('Status 405: Invalid Method', () =>{
-      const invalidMEthods = ['delete', 'patch', 'put', 'post', 'get'];
-       const prmiseArr = invalidMEthods.map((method) => {
-        return request(app)
-        [method]('/api/XXX/XXX')
-//     .expect(405)
-//     .then(({body: {msg}}) => {
-//       expect(msg).to.eql('method not allowed');
-//     })
-//   })
-// return Promise.all(peomiseArr)
-//})
-
-
-/// promise all per describe - see notes
-
-// router.delete((req, res, next) => {
-//   res.status(405).send({ msg: "Method Not Allowed" });
-//.path()
-// use in articles.router.js
-// router.all(handle405s)
-// });
-// indexedDB.js
-// exports.handle405
-//
-// in app
-// app.use(handle405s)
-
-

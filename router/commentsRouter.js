@@ -3,8 +3,12 @@ const {
   patchComments_VoteByID,
   deleteCommentByID
 } = require("../controller/comments.js");
+const { handle405s } = require("../errors/errors.js");
 
-commentsRouter.patch("/:comment_id", patchComments_VoteByID);
-commentsRouter.delete("/:comment_id", deleteCommentByID);
+commentsRouter
+  .route("/:comment_id")
+  .patch(patchComments_VoteByID)
+  .delete(deleteCommentByID)
+  .all(handle405s);
 
 module.exports = commentsRouter;

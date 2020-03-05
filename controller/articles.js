@@ -58,7 +58,6 @@ exports.getCommentsByArtID = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  console.log("are we here?");
   const { sort_by, order, author, topic } = req.query;
 
   selectAllArticles(sort_by, order, author, topic)

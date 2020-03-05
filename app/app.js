@@ -1,13 +1,18 @@
 const express = require("express");
 const app = express();
 const apiRouter = require("../router/apiRouter.js");
+const { handle405s, handleCustomErrors } = require("../errors/errors");
 
 app.use(express.json());
 app.use("/api", apiRouter);
 
+//app.use(handleCustomErrors);
+
 app.use((req, res, next) => {
   res.status(404).send({ msg: "Path does not exist" });
 });
+
+app.use(handle405s);
 
 app.use((err, req, res, next) => {
   if (err.status) {
