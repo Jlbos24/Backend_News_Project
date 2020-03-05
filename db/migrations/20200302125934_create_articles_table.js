@@ -4,8 +4,14 @@ exports.up = function(knex) {
     tableBuilder.string("title").notNullable();
     tableBuilder.string("body", [5000]).notNullable();
     tableBuilder.integer("votes").defaultTo(0);
-    tableBuilder.string("topic", [1000]).references("topics.slug");
-    tableBuilder.string("author").references("users.username");
+    tableBuilder
+      .string("topic", [1000])
+      .references("topics.slug")
+      .notNullable();
+    tableBuilder
+      .string("author")
+      .references("users.username")
+      .notNullable();
     tableBuilder.timestamp("created_at").defaultTo(knex.fn.now());
   });
 };

@@ -18,7 +18,7 @@ exports.seed = function(knex) {
       return Promise.all([topicsInsertions, usersInsertions])
         .then(() => {
           let newArticleData = formatDates(articleData);
-          console.log(newArticleData, "new artt data");
+
           return newArticleData;
         })
         .then(newArticleData => {
