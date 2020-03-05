@@ -189,12 +189,36 @@ describe("/api", () => {
             expect(res.body.articles.length).to.eql(11);
           });
       });
+      it("Test 400: Bad Request for an Invalid Column ", () => {
+        return request(app)
+          .get("/api/articles/sort_by=invalid_column")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad Request");
+          });
+      });
+      xit("Status: 400 - Order Query Incorrectly Input", () => {
+        return request(app)
+          .get("/api/articles?invalid=desc")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad Request on Query");
+          });
+      });
+      xit("Status: 400 - Sort_By Incorrectly Input", () => {
+        return request(app)
+          .get("/api/articles?unsort_by=topic")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad Request on Query");
+          });
+      });
       xit("Status: 400 - Filter Column Does Not Exist", () => {
         return request(app)
-          .get("/api/articles?topicals=mitch")
+          .get("/api/articles?invalid=mitch")
           .expect(400)
-          .then(res => {
-            expect(res.body.articles.length).to.eql(12);
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad Request on Query");
           });
       });
       describe("INVALID METHOD", () => {
@@ -250,7 +274,7 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status: 404 Invalid Username - Good Article ID - Does Not Exist", () => {
+        it("Status: 422 Invalid Username - Good Article ID - Does Not Exist", () => {
           return request(app)
             .get("/api/articles/99999")
             .expect(422)
@@ -369,180 +393,202 @@ describe("/api", () => {
         });
       });
     });
-    describe("/comments", () => {
-      describe("POST", () => {
-        it("Status: 201 - Respond with a posted comment when requested ", () => {
-          return request(app)
-            .post("/api/articles/1/comments")
-            .send({
-              username: "butter_bridge",
-              body: "This is a fantastic article"
-            })
-            .expect(201)
-            .then(res => {
-              expect(res.body.comment).to.be.an("Object");
-              expect(res.body.comment).to.contain.keys(
-                "comment_id",
-                "author",
-                "article_id",
-                "votes",
-                "created_at",
-                "body"
-              );
-              expect(res.body.comment.body).to.eql(
-                "This is a fantastic article"
-              );
-            });
-        });
-        it("Status: 400 No data passed in body", () => {
-          return request(app)
-            .post("/api/articles/1/comments")
-            .send()
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Bad Request");
-            });
-        });
-        it("Status: 400 When Passed Missing Key/Value Pair", () => {
-          return request(app)
-            .post("/api/articles/1/comments")
-            .send({
-              body: "What an awesome article"
-            })
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Bad Request");
-            });
-        });
-        it("Status: 400 Incorrect data types passed in body", () => {
-          return request(app)
-            .post("/api/articles/1/comments")
-            .send({
-              username: 5,
-              body: 99999
-            })
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Bad Request");
-            });
-        });
-        it("Status: 400 Incorrect Keys Passed from Client", () => {
-          return request(app)
-            .post("/api/articles/1/comments")
-            .send({
-              topic: "mitch",
-              body: "nice article"
-            })
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Bad Request");
-            });
-        });
-        xit("Status: 422 - Good Comment ID = ID Does Not Yet Exist", () => {
-          return request(app)
-            .post("/api/articles/9999/comments")
-            .send({
-              username: "butter_bridge",
-              body: "This is a fantastic article"
-            })
-            .expect(422)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("ID Does Not Exist");
-            });
-        });
-      });
-      describe("GET", () => {
-        it("Status 200 - Retrieve Comments by Article ID", () => {
-          return request(app)
-            .get("/api/articles/1/comments")
-            .expect(200)
-            .then(res => {
-              expect(res.body.comments).to.be.an("Array");
-              expect(res.body.comments[0]).to.contain.keys(
-                "comment_id",
-                "author",
-                "article_id",
-                "votes",
-                "created_at",
-                "body"
-              );
-            });
-        });
-        it("status: 200 - Sort by created_at as default", () => {
-          return request(app)
-            .get("/api/articles/1/comments")
-            .expect(200)
-            .then(res => {
-              expect(res.body.comments).to.be.sorted("created_at");
-            });
-        });
-        it("status: 200 - Sort Descending", () => {
-          return request(app)
-            .get("/api/articles/1/comments?order=desc")
-            .expect(200)
-            .then(res => {
-              expect(res.body.comments).to.be.descending;
-            });
-        });
-        it("status: 200 - Sort by Author descending", () => {
-          return request(app)
-            .get("/api/articles/1/comments?sort_by=author")
-            .expect(200)
-            .then(res => {
-              expect(res.body.comments).to.be.sorted("author");
-            });
-        });
-        it("status: 200 - Sort Ascending", () => {
-          return request(app)
-            .get("/api/articles/1/comments?order=asc")
-            .expect(200)
-            .then(res => {
-              expect(res.body.comments).to.be.ascending;
-            });
-        });
-        it("Test 400: Bad Request for an Invalid Column ", () => {
-          return request(app)
-            .get("/api/articles/1/comments?sort_by=invalid_column")
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Bad Request");
-            });
-        });
-        it("Test 400: Resource file Not Found ", () => {
-          return request(app)
-            .get("/api/articles/test/comments?sort_by=author")
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Bad Request");
-            });
-        });
-        xit("STILL TO DO FOR OTHER SECTIONS ON Invalid IDTest 400: Invalid ID ", () => {
-          return request(app)
-            .get("/api/articles/9999/comments?sort_by=author")
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Bad Request");
-            });
-        });
-        xit("WHAT OTHER TESTS FOR THIS?", () => {});
-      });
-      describe("INVALID METHOD", () => {
-        it("Statu: 405 Invalid Method", () => {
-          const invalidMethods = ["delete", "patch"];
-          const promiseArray = invalidMethods.map(method => {
+    describe("/:articles_id", () => {
+      describe("/comments", () => {
+        describe("POST", () => {
+          it("Status: 201 Respond with a posted comment when requested ", () => {
             return request(app)
-              [method]("/api/articles/:articles_id/comments")
-              .expect(405)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal("Method Not Allowed");
+              .post("/api/articles/1/comments")
+              .send({
+                username: "butter_bridge",
+                body: "This is a fantastic article"
+              })
+              .expect(201)
+              .then(res => {
+                expect(res.body.comment).to.be.an("Object");
+                expect(res.body.comment).to.contain.keys(
+                  "comment_id",
+                  "author",
+                  "article_id",
+                  "votes",
+                  "created_at",
+                  "body"
+                );
+                expect(res.body.comment.body).to.eql(
+                  "This is a fantastic article"
+                );
               });
           });
-          return Promise.all(promiseArray);
+          it("Status: 400 No data passed in body", () => {
+            return request(app)
+              .post("/api/articles/1/comments")
+              .send()
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Bad Request");
+              });
+          });
+          it("Status: 400 When Passed Missing Key/Value Pair", () => {
+            return request(app)
+              .post("/api/articles/1/comments")
+              .send({
+                body: "What an awesome article"
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Bad Request");
+              });
+          });
+          it("Status: 400 Incorrect data types passed in body", () => {
+            return request(app)
+              .post("/api/articles/1/comments")
+              .send({
+                username: 5,
+                body: 99999
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Bad Request");
+              });
+          });
+          it("Status: 400 Incorrect keys passed from client", () => {
+            return request(app)
+              .post("/api/articles/1/comments")
+              .send({
+                topic: "mitch",
+                body: "nice article"
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Bad Request");
+              });
+          });
+          it("Status: 400 Good Article ID = ID Does Not Yet Exist - PSQL ERROR", () => {
+            return request(app)
+              .post("/api/articles/9999/comments")
+              .send({
+                username: "butter_bridge",
+                body: "This is a fantastic article"
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Bad Request");
+              });
+          });
+          it("Status: 400 Bad Article ID = ID Does Not Yet Exist - PSQL ERROR", () => {
+            return request(app)
+              .post("/api/articles/invalid_id/comments")
+              .send({
+                username: "butter_bridge",
+                body: "This is a fantastic article"
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Bad Request");
+              });
+          });
+        });
+        describe("GET", () => {
+          it("Status: 200 - Retrieve Comments by Article ID", () => {
+            return request(app)
+              .get("/api/articles/1/comments")
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments).to.be.an("Array");
+                expect(res.body.comments[0]).to.contain.keys(
+                  "comment_id",
+                  "author",
+                  "article_id",
+                  "votes",
+                  "created_at",
+                  "body"
+                );
+              });
+          });
+          it("Status: 200 - Sort by created_at as default", () => {
+            return request(app)
+              .get("/api/articles/1/comments")
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments).to.be.sorted("created_at");
+                expect(res.body.comments).to.be.an("Array");
+                expect(res.body.comments[0]).to.contain.keys(
+                  "comment_id",
+                  "author",
+                  "article_id",
+                  "votes",
+                  "created_at",
+                  "body"
+                );
+              });
+          });
+          it("Status: 200 - Sort Descending", () => {
+            return request(app)
+              .get("/api/articles/1/comments?order=desc")
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments).to.be.descending;
+              });
+          });
+          it("Status: 200 - Sort by Author descending", () => {
+            return request(app)
+              .get("/api/articles/1/comments?sort_by=author")
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments).to.be.sorted("author");
+                expect(res.body.comments).to.be.descending;
+              });
+          });
+          it("Status: 200 - Sort Ascending", () => {
+            return request(app)
+              .get("/api/articles/1/comments?order=asc")
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments).to.be.ascending;
+              });
+          });
+          it("Test 400: Bad Request for an Invalid Column ", () => {
+            return request(app)
+              .get("/api/articles/1/comments?sort_by=invalid_column")
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Bad Request");
+              });
+          });
+          it("Status 400: Bad Article ID ", () => {
+            return request(app)
+              .get("/api/articles/test/comments")
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Bad Request");
+              });
+          });
+          xit("Status 400: Good Article ID - Does Not Exist", () => {
+            return request(app)
+              .get("/api/articles/9999/comments")
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Bad Request");
+              });
+          });
+          describe("INVALID METHOD", () => {
+            it("Statu: 405 Invalid Method", () => {
+              const invalidMethods = ["delete", "patch"];
+              const promiseArray = invalidMethods.map(method => {
+                return request(app)
+                  [method]("/api/articles/:articles_id/comments")
+                  .expect(405)
+                  .then(({ body: { msg } }) => {
+                    expect(msg).to.equal("Method Not Allowed");
+                  });
+              });
+              return Promise.all(promiseArray);
+            });
+          });
         });
       });
     });
   });
-
   describe("/comments", () => {
     describe("/:comment_id", () => {
       describe("PATCH", () => {

@@ -60,11 +60,6 @@ exports.postCommentByID = (article_id, comment) => {
   newCommentObj.author = comment.username;
   newCommentObj.body = comment.body;
   newCommentObj.article_id = article_id;
-  // to be done for good id that does not yet exist
-  // return Promise.reject({
-  //   status: 422,
-  //   msg: "ID Does Not Exist"
-  // });
 
   return connection("comments")
     .insert(newCommentObj)
