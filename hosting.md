@@ -49,6 +49,9 @@ git push heroku master
 
 Go to the heroku site and log in.
 
+jlbosman24@gmail.com
+justin@24@server
+
 - Select your application
 - `Configure Add-ons`
 - Choose `Heroku Postgres`
@@ -81,8 +84,8 @@ const { DB_URL } = process.env;
 const customConfigs = {
   // ...
   production: {
-    connection: `${DB_URL}?ssl=true`,
-  },
+    connection: `${DB_URL}?ssl=true`
+  }
 };
 // ...
 ```
@@ -122,13 +125,13 @@ npm run seed:prod
 Change your connection file to look something like this:
 
 ```js
-const ENV = process.env.NODE_ENV || 'development';
-const knex = require('knex');
+const ENV = process.env.NODE_ENV || "development";
+const knex = require("knex");
 
 const dbConfig =
-  ENV === 'production'
-    ? { client: 'pg', connection: process.env.DATABASE_URL }
-    : require('../knexfile');
+  ENV === "production"
+    ? { client: "pg", connection: process.env.DATABASE_URL }
+    : require("../knexfile");
 
 module.exports = knex(dbConfig);
 ```

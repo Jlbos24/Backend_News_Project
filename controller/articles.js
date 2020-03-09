@@ -3,7 +3,10 @@ const {
   patchVoteByID,
   postCommentByID,
   selectCommentsByID,
-  selectAllArticles
+  selectAllArticles,
+  verifyAuthor,
+  verifyTopic,
+  verifyArticleID
 } = require("../model/articles.js");
 
 exports.getArticlesByID = (req, res, next) => {
@@ -13,22 +16,17 @@ exports.getArticlesByID = (req, res, next) => {
     .then(article => {
       res.status(200).send({ article });
     })
-    .catch(error => {
-      next(error);
-    });
+    .catch(next);
 };
 
 exports.patchVotesByID = (req, res, next) => {
   const { article_id } = req.params;
-  const votes = req.body;
 
-  patchVoteByID(article_id, votes)
+  patchVoteByID(article_id, req.body)
     .then(article => {
       res.status(200).send({ article });
     })
-    .catch(error => {
-      next(error);
-    });
+    .catch(next);
 };
 
 exports.postCommentByArtID = (req, res, next) => {
@@ -39,9 +37,7 @@ exports.postCommentByArtID = (req, res, next) => {
     .then(comment => {
       res.status(201).send({ comment });
     })
-    .catch(error => {
-      next(error);
-    });
+    .catch(next);
 };
 
 exports.getCommentsByArtID = (req, res, next) => {
@@ -52,21 +48,26 @@ exports.getCommentsByArtID = (req, res, next) => {
     .then(comments => {
       res.status(200).send({ comments });
     })
-    .catch(error => {
-      next(error);
-    });
+    .catch(next);
 };
 
 exports.getAllArticles = (req, res, next) => {
   const { sort_by, order, author, topic } = req.query;
 
-  //console.log(req.query);
+  const promiseArticles = [];
 
-  selectAllArticles(sort_by, order, author, topic)
-    .then(articles => {
+  promiseArticles.push(selectAllArticles(sort_by, order, author, topic));
+
+  if (author) {
+    promiseArticles.push(verifyAuthor(author));
+  }
+  if (topic) {
+    promiseArticles.push(verifyTopic(topic));
+  }
+
+  return Promise.all(promiseArticles)
+    .then(([articles]) => {
       res.status(200).send({ articles });
     })
-    .catch(error => {
-      next(error);
-    });
+    .catch(next);
 };

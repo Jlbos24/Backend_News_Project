@@ -10,7 +10,7 @@ exports.selectArticleByID = article_id => {
     .then(([article]) => {
       if (!article) {
         return Promise.reject({
-          status: 422,
+          status: 404,
           msg: "Article ID Does Not Exist"
         });
       }
@@ -29,27 +29,15 @@ exports.patchVoteByID = (article_id, votes) => {
   } else {
     return connection("articles")
       .where("article_id", article_id)
+      .increment("votes", votes.inc_votes)
+      .returning("*")
       .then(([rows]) => {
         if (!rows) {
           return Promise.reject({
-            status: 422,
+            status: 404,
             msg: "ID Does Not Exist"
           });
-        } else {
-          return connection("articles")
-            .select("*")
-            .where("article_id", "=", article_id)
-            .returning("*")
-            .then(rows => {
-              const updateArray = rows.map(row => {
-                let newPatchObj = { ...row };
-                let newTally = newPatchObj.votes + votes.inc_votes;
-                newPatchObj.votes = newTally;
-                return newPatchObj;
-              });
-              return updateArray[0];
-            });
-        }
+        } else return rows;
       });
   }
 };
@@ -73,7 +61,12 @@ exports.selectCommentsByID = (article_id, sort_by, order) => {
   return connection("comments")
     .select("*")
     .where("article_id", "=", article_id)
-    .orderBy(sort_by || "created_at", order || "desc");
+    .orderBy(sort_by || "created_at", order || "desc")
+    .then(row => {
+      if (row.length == 0) {
+        return Promise.reject({ status: 404, msg: "ID Does Not Exist" });
+      } else return row;
+    });
 };
 
 exports.selectAllArticles = (sort_by, order, author, topic) => {
@@ -86,5 +79,34 @@ exports.selectAllArticles = (sort_by, order, author, topic) => {
     .modify(query => {
       if (author) query.where("articles.author", author);
       if (topic) query.where("articles.topic", topic);
+    })
+    .then(row => {
+      if (!row) {
+        return Promise.reject({ status: 404, msg: "Bad Request on Query" });
+      } else return row;
+    });
+};
+
+exports.verifyTopic = topic => {
+  return connection("topics")
+    .select("*")
+    .where("slug", topic)
+    .returning("*")
+    .then(([row]) => {
+      if (!row) {
+        return Promise.reject({ status: 404, msg: "Bad Request on Query" });
+      }
+    });
+};
+
+exports.verifyAuthor = author => {
+  return connection("users")
+    .select("*")
+    .where("username", author)
+    .returning("*")
+    .then(([row]) => {
+      if (!row) {
+        return Promise.reject({ status: 404, msg: "Bad Request on Query" });
+      }
     });
 };

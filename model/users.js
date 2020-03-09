@@ -6,7 +6,7 @@ exports.selectUserByID = username => {
     .where("username", username)
     .then(([user]) => {
       if (!user) {
-        return Promise.reject({ status: 422, msg: "Username Does Not Exist" });
+        return Promise.reject({ status: 404, msg: "Username Does Not Exist" });
       } else return user;
     });
 };

@@ -69,18 +69,18 @@ describe("/api", () => {
             );
           });
       });
-      it("Status: User ID does not exist", () => {
+      it("Status: 404 Good ID that does not yet exist", () => {
         return request(app)
           .get("/api/users/invalid_username")
-          .expect(422)
+          .expect(404)
           .then(({ body: { msg } }) => {
             expect(msg).to.equal("Username Does Not Exist");
           });
       });
-      it("Status: 422 User ID does not exist for integer", () => {
+      it("Status: 404 Bad ID - Incorrect data type ", () => {
         return request(app)
           .get("/api/users/999")
-          .expect(422)
+          .expect(404)
           .then(({ body: { msg } }) => {
             expect(msg).to.equal("Username Does Not Exist");
           });
@@ -189,7 +189,7 @@ describe("/api", () => {
             expect(res.body.articles.length).to.eql(11);
           });
       });
-      it("Test 400: Bad Request for an Invalid Column ", () => {
+      it("Status: 400 - Bad Request for an Invalid Column ", () => {
         return request(app)
           .get("/api/articles/sort_by=invalid_column")
           .expect(400)
@@ -197,26 +197,18 @@ describe("/api", () => {
             expect(msg).to.equal("Bad Request");
           });
       });
-      xit("Status: 400 - Order Query Incorrectly Input", () => {
+      it("Status: 400 - Check Topic Filter Exists", () => {
         return request(app)
-          .get("/api/articles?invalid=desc")
-          .expect(400)
+          .get("/api/articles?topic=does_not_exist")
+          .expect(404)
           .then(({ body: { msg } }) => {
             expect(msg).to.equal("Bad Request on Query");
           });
       });
-      xit("Status: 400 - Sort_By Incorrectly Input", () => {
+      it("Status: 400 - Check Author Filter Exists", () => {
         return request(app)
-          .get("/api/articles?unsort_by=topic")
-          .expect(400)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Bad Request on Query");
-          });
-      });
-      xit("Status: 400 - Filter Column Does Not Exist", () => {
-        return request(app)
-          .get("/api/articles?invalid=mitch")
-          .expect(400)
+          .get("/api/articles?author=does_not_exist")
+          .expect(404)
           .then(({ body: { msg } }) => {
             expect(msg).to.equal("Bad Request on Query");
           });
@@ -274,10 +266,10 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status: 422 Invalid Username - Good Article ID - Does Not Exist", () => {
+        it("Status: 404 Invalid Username - Good Article ID - Does Not Exist", () => {
           return request(app)
             .get("/api/articles/99999")
-            .expect(422)
+            .expect(404)
             .then(({ body: { msg } }) => {
               expect(msg).to.equal("Article ID Does Not Exist");
             });
@@ -359,20 +351,20 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status: 400 Incorrect key/value pairs for inc_votes", () => {
+        it("Status: 400 Incorrect key/value pairs", () => {
           return request(app)
             .patch("/api/articles/1")
-            .send({ inc_votes: 1, name: "Mitch" })
+            .send({ name: "Mitch" })
             .expect(400)
             .then(({ body: { msg } }) => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status: 422 Invalid Article ID - Good Article ID - Does Not Exist", () => {
+        it("Status: 404 Invalid Article ID - Good Article ID - Does Not Exist", () => {
           return request(app)
             .patch("/api/articles/99999")
             .send({ inc_votes: -50 })
-            .expect(422)
+            .expect(404)
             .then(({ body: { msg } }) => {
               expect(msg).to.equal("ID Does Not Exist");
             });
@@ -547,7 +539,7 @@ describe("/api", () => {
                 expect(res.body.comments).to.be.ascending;
               });
           });
-          it("Test 400: Bad Request for an Invalid Column ", () => {
+          it("Status: 400 - Bad Request for an Invalid Column ", () => {
             return request(app)
               .get("/api/articles/1/comments?sort_by=invalid_column")
               .expect(400)
@@ -555,7 +547,7 @@ describe("/api", () => {
                 expect(msg).to.equal("Bad Request");
               });
           });
-          it("Status 400: Bad Article ID ", () => {
+          it("Status: 400 - Bad Article ID ", () => {
             return request(app)
               .get("/api/articles/test/comments")
               .expect(400)
@@ -563,16 +555,17 @@ describe("/api", () => {
                 expect(msg).to.equal("Bad Request");
               });
           });
-          xit("Status 400: Good Article ID - Does Not Exist", () => {
+          it("Status: 404 - Good Article ID - Does Not Exist", () => {
             return request(app)
               .get("/api/articles/9999/comments")
-              .expect(400)
+              .expect(404)
               .then(({ body: { msg } }) => {
-                expect(msg).to.equal("Bad Request");
+                expect(msg).to.equal("ID Does Not Exist");
               });
           });
+
           describe("INVALID METHOD", () => {
-            it("Statu: 405 Invalid Method", () => {
+            it("Status: 405 Invalid Method", () => {
               const invalidMethods = ["delete", "patch"];
               const promiseArray = invalidMethods.map(method => {
                 return request(app)
@@ -658,16 +651,6 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
-        it("Status: 422 Invalid Article ID - Good Article ID - Does Not Exist", () => {
-          return request(app)
-            .patch("/api/comments/99999")
-            .send({ inc_votes: -50 })
-            .expect(422)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("ID Does Not Exist");
-            });
-        });
-
         it("Status: 400 Incorrect data type", () => {
           return request(app)
             .patch("/api/comments/1")
@@ -686,6 +669,15 @@ describe("/api", () => {
               expect(msg).to.equal("Bad Request");
             });
         });
+        it("Status: 404 Invalid Article ID - Good Article ID - Does Not Exist", () => {
+          return request(app)
+            .patch("/api/comments/99999")
+            .send({ inc_votes: -50 })
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("ID Does Not Exist");
+            });
+        });
       });
       describe("DELETE", () => {
         it("Status: 204 No content for successful deletion", () => {
@@ -696,7 +688,7 @@ describe("/api", () => {
         it("Status: 404 Comment ID does not exist", () => {
           return request(app)
             .delete("/api/comments/9999")
-            .expect(422)
+            .expect(404)
             .then(({ body: { msg } }) => {
               expect(msg).to.eql("Delete Unsuccessful - ID Not Found");
             });
@@ -724,6 +716,17 @@ describe("/api", () => {
           return Promise.all(promiseArray);
         });
       });
+    });
+  });
+
+  describe.only("GET API", () => {
+    it("Status", () => {
+      return request(app)
+        .get("/api/")
+        .expect(200)
+        .then(res => {
+          expect(res.status).to.be(200);
+        });
     });
   });
 

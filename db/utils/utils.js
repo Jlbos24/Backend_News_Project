@@ -16,7 +16,7 @@ exports.makeRefObj = list => {
   const refObject = {};
 
   list.forEach(article => {
-    return (refObject[article.title] = article.article_id);
+    refObject[article.title] = article.article_id;
   });
 
   return refObject;
