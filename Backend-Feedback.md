@@ -7,7 +7,7 @@ TO DO
 next stages
 
 - get(/apis)
-- hosting
+- hosting - done
 - readmeS
 
 ## Test Output
