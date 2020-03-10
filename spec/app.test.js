@@ -719,7 +719,7 @@ describe("/api", () => {
     });
   });
 
-  describe.only("GET API", () => {
+  xdescribe("GET API", () => {
     it("Status", () => {
       return request(app)
         .get("/api/")

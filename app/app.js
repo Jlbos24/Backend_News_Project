@@ -8,7 +8,6 @@ const {
   handlePsqlErrors,
   handleServerErrors
 } = require("../errors/errors");
-const { PORT = 9090 } = process.env;
 
 app.use(express.json());
 app.use("/api", apiRouter);
