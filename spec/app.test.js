@@ -55,49 +55,164 @@ describe("/api", () => {
     });
   });
   describe("/users", () => {
-    describe("GET", () => {
-      it("Status: 200 Get Request responds with a selected user when passed a username", () => {
-        return request(app)
-          .get("/api/users/butter_bridge")
-          .expect(200)
-          .then(res => {
-            expect(res.body.user).to.be.an("Object");
-            expect(res.body.user).to.contain.keys(
-              "username",
-              "avatar_url",
-              "name"
-            );
-          });
-      });
-      it("Status: 404 Good ID that does not yet exist", () => {
-        return request(app)
-          .get("/api/users/invalid_username")
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Username Does Not Exist");
-          });
-      });
-      it("Status: 404 Bad ID - Incorrect data type ", () => {
-        return request(app)
-          .get("/api/users/999")
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Username Does Not Exist");
-          });
-      });
-    });
-    describe("INVALID METHOD", () => {
-      it("Status: 405 Invalid Method", () => {
-        const invalidMethods = ["delete", "patch", "put", "post"];
-        const promiseArray = invalidMethods.map(method => {
+    describe.only("/", () => {
+      describe("GET", () => {
+        it("Status: 200 Get Request responds with all users", () => {
           return request(app)
-            [method]("/api/users/:username")
-            .expect(405)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Method Not Allowed");
+            .get("/api/users")
+            .expect(200)
+            .then(res => {
+              expect(res.body.users).to.be.an("Array");
+              expect(res.body.users[0]).to.contain.keys(
+                "username",
+                "avatar_url",
+                "name"
+              );
             });
         });
-        return Promise.all(promiseArray);
+        it("Status: 200 - Sort by Name Descending", () => {
+          return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then(res => {
+              expect(res.body.users).to.be.sorted("name");
+              expect(res.body.users).to.be.an("Array");
+              expect(res.body.users).to.be.descending;
+            });
+        });
+        it("Status: 404 Path Not Found for Get Request", () => {
+          return request(app)
+            .get("/api/user")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Path does not exist");
+            });
+        });
+      });
+      describe("POST", () => {
+        it("Status: 201 New User Successfully Created", () => {
+          return request(app)
+            .post("/api/users")
+            .send({ username: "jlbos", name: "Justin", avatar_url: "" })
+            .expect(201)
+            .then(res => {
+              expect(res.body.user).to.be.an("Object");
+              expect(res.body.user).to.contain.keys(
+                "username",
+                "name",
+                "avatar_url"
+              );
+              expect(res.body.user.name).to.eql("Justin");
+            });
+        });
+        it("Status: 400 No Data Passed in Body", () => {
+          return request(app)
+            .post("/api/users")
+            .send()
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Bad Request");
+            });
+        });
+        it("Status: 400 When Passed Missing Key/Value Pair", () => {
+          return request(app)
+            .post("/api/users")
+            .send({
+              username: "ayyup",
+              avatar_url: ""
+            })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Bad Request");
+            });
+        });
+        it("Status: 400 Not Null Values", () => {
+          return request(app)
+            .post("/api/users")
+            .send({
+              username: "editor05",
+              name: "Justin",
+              avatar_url: null
+            })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Bad Request");
+            });
+        });
+        it("Status: 400 Post on Incorrect Key Names", () => {
+          return request(app)
+            .post("/api/users")
+            .send({
+              user: "123writer",
+              name: "mitch",
+              avatar_url: "www.facebook.com"
+            })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Bad Request");
+            });
+        });
+      });
+      describe("INVALID METHOD", () => {
+        it("Status: 405 Invalid Method", () => {
+          const invalidMethods = ["delete", "patch", "put"];
+          const promiseArray = invalidMethods.map(method => {
+            return request(app)
+              [method]("/api/users")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Method Not Allowed");
+              });
+          });
+          return Promise.all(promiseArray);
+        });
+      });
+    });
+    describe("/username", () => {
+      describe("GET", () => {
+        it("Status: 200 Get Request responds with a selected user when passed a username", () => {
+          return request(app)
+            .get("/api/users/butter_bridge")
+            .expect(200)
+            .then(res => {
+              expect(res.body.user).to.be.an("Object");
+              expect(res.body.user).to.contain.keys(
+                "username",
+                "avatar_url",
+                "name"
+              );
+            });
+        });
+        it("Status: 404 Good ID that does not yet exist", () => {
+          return request(app)
+            .get("/api/users/invalid_username")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Username Does Not Exist");
+            });
+        });
+        it("Status: 404 Bad ID - Incorrect data type ", () => {
+          return request(app)
+            .get("/api/users/999")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Username Does Not Exist");
+            });
+        });
+      });
+      describe("INVALID METHOD", () => {
+        it("Status: 405 Invalid Method", () => {
+          const invalidMethods = ["delete", "patch", "put", "post"];
+          const promiseArray = invalidMethods.map(method => {
+            return request(app)
+              [method]("/api/users/:username")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Method Not Allowed");
+              });
+          });
+          return Promise.all(promiseArray);
+        });
       });
     });
   });
@@ -720,13 +835,13 @@ describe("/api", () => {
     });
   });
 
-  xdescribe("GET API", () => {
-    it("Status", () => {
+  describe("GET API", () => {
+    it("Status:  200 when passing endpoints to api", () => {
       return request(app)
         .get("/api/")
         .expect(200)
         .then(res => {
-          expect(res.status).to.be(200);
+          expect(res.status).to.equal(200);
         });
     });
   });

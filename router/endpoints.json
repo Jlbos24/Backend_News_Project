@@ -11,17 +11,49 @@
     }
   },
 
-  "GET /api/users": {
+  "GET /api/users/:id": {
     "description": "serves an object with a users details",
     "queries": [],
     "exampleResponse": {
-      "topics": [
+      "user": {
+        "username": "ace19",
+        "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4 ",
+        "name": "jason"
+      }
+    }
+  },
+
+  "GET /api/users": {
+    "description": "serves an array with all users",
+    "queries": ["default sort by on name and ordered descending"],
+    "exampleResponse": {
+      "users": [
         {
-          "username": "ace19",
-          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4 ",
-          "name": "jason"
+          "username": "butter_bridge",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        },
+        {
+          "username": "icellusedkars",
+          "name": "sam",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
         }
       ]
+    }
+  },
+  "POST /api/users": {
+    "description": "creates a new user",
+    "request body": {
+      "username": "justin99",
+      "name": "Justin",
+      "avatar_url": "www.github.com"
+    },
+    "exampleResponse": {
+      "user": {
+        "username": "justin99",
+        "name": "Justin",
+        "avatar_url": "www.github.com"
+      }
     }
   },
   "GET /api/articles": {
