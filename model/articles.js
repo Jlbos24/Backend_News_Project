@@ -50,10 +50,24 @@ exports.postCommentByID = (article_id, comment) => {
   newCommentObj.article_id = article_id;
 
   return connection("comments")
-    .insert(newCommentObj)
+    .insert([newCommentObj])
+    .where("article_id", "=", article_id)
+    .returning("*");
+};
+
+exports.verifyArticleID = article_id => {
+  return connection
+    .select("*")
+    .from("articles")
+    .where("article_id", "=", article_id)
     .returning("*")
-    .then(([rows]) => {
-      return rows;
+    .then(article => {
+      if (article.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Article Does Not Exist"
+        });
+      }
     });
 };
 

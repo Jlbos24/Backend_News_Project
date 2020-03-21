@@ -197,7 +197,7 @@ describe("/api", () => {
             expect(msg).to.equal("Bad Request");
           });
       });
-      it("Status: 400 - Check Topic Filter Exists", () => {
+      it("Status: 404 - Check Topic Filter Exists", () => {
         return request(app)
           .get("/api/articles?topic=does_not_exist")
           .expect(404)
@@ -205,7 +205,7 @@ describe("/api", () => {
             expect(msg).to.equal("Bad Request on Query");
           });
       });
-      it("Status: 400 - Check Author Filter Exists", () => {
+      it("Status: 404 - Check Author Filter Exists", () => {
         return request(app)
           .get("/api/articles?author=does_not_exist")
           .expect(404)
@@ -455,9 +455,10 @@ describe("/api", () => {
                 expect(msg).to.equal("Bad Request");
               });
           });
-          it("Status: 400 Good Article ID = ID Does Not Yet Exist - PSQL ERROR", () => {
+
+          it("Status: 400 Bad Article ID - PSQL ERROR", () => {
             return request(app)
-              .post("/api/articles/9999/comments")
+              .post("/api/articles/invalid_type_id/comments")
               .send({
                 username: "butter_bridge",
                 body: "This is a fantastic article"
@@ -467,16 +468,16 @@ describe("/api", () => {
                 expect(msg).to.equal("Bad Request");
               });
           });
-          it("Status: 400 Bad Article ID = ID Does Not Yet Exist - PSQL ERROR", () => {
+          it("Status: 404 Good Article ID = ID Does Not Yet Exist", () => {
             return request(app)
-              .post("/api/articles/invalid_id/comments")
+              .post("/api/articles/9999/comments")
               .send({
                 username: "butter_bridge",
                 body: "This is a fantastic article"
               })
-              .expect(400)
+              .expect(404)
               .then(({ body: { msg } }) => {
-                expect(msg).to.equal("Bad Request");
+                expect(msg).to.equal("Article Does Not Exist");
               });
           });
         });

@@ -12,6 +12,10 @@ const {
 app.use(express.json());
 app.use("/api", apiRouter);
 
+// app.all("/api/*", (req, res, next) => {
+//   //console.log(routes);
+// });
+
 app.use(handle404s);
 app.use(handleCustomErrors);
 app.use(handlePsqlErrors);

@@ -1,14 +1,22 @@
 TO DO
 
-- tests on promis alls
-- tests on user endpointS
-- error handles
+### DELETE `/api`
 
-next stages
+Assertion: expected 404 to equal 405
 
-- get(/apis)
-- hosting - done
-- readmeS
+Hints:
+
+- use `.all()` on each route, to serve a 405: Method Not Found status code
+
+---
+
+## DONE!!!! POST `/api/articles/10000/comments`
+
+Assertion: expected 400 to be one of [ 404, 422 ]
+
+Hints:
+
+- use a 404: Not Found _OR_ 422: Unprocessable Entity status code when `POST` contains a valid article ID that does not exist
 
 ## Test Output
 
@@ -48,14 +56,6 @@ Hints:
 
 - return 404: Not Found when given a valid `article_id` that does not exist
 
-XXXXX DONE NEEDS CHECKING POST `/api/articles/10000/comments`
-
-Assertion: expected 400 to be one of [ 404, 422 ]
-
-Hints:
-
-- use a 404: Not Found _OR_ 422: Unprocessable Entity status code when `POST` contains a valid article ID that does not exist
-
 XXXXX DONE PATCH `/api/comments/1000`
 
 Assertion: expected 422 to equal 404
@@ -79,16 +79,6 @@ Assertion: expected 422 to equal 404
 Hints:
 
 - if a user is not found with a valid `user_id`, use a 404: Not Found status code
-
-### DELETE `/api`
-
-Assertion: expected 404 to equal 405
-
-Hints:
-
-- use `.all()` on each route, to serve a 405: Method Not Found status code
-
----
 
 ## Seed
 

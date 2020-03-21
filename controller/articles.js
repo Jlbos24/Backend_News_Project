@@ -33,8 +33,13 @@ exports.postCommentByArtID = (req, res, next) => {
   const { article_id } = req.params;
   const comment = req.body;
 
-  postCommentByID(article_id, comment)
-    .then(comment => {
+  const promiseArray = [];
+
+  promiseArray.push(postCommentByID(article_id, comment));
+  promiseArray.push(verifyArticleID(article_id));
+
+  return Promise.all(promiseArray)
+    .then(([[comment]]) => {
       res.status(201).send({ comment });
     })
     .catch(next);

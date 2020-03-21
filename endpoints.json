@@ -2,26 +2,124 @@
   "GET /api": {
     "description": "serves up a json representation of all the available endpoints of the api"
   },
+
   "GET /api/topics": {
     "description": "serves an array of all topics",
     "queries": [],
     "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
+      "topics": [{ "slug": "Pandemics", "description": "World Response" }]
+    }
+  },
+
+  "GET /api/users": {
+    "description": "serves an object with a users details",
+    "queries": [],
+    "exampleResponse": {
+      "topics": [
+        {
+          "username": "ace19",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4 ",
+          "name": "jason"
+        }
+      ]
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
+    "description": "serves an array of all articles",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
+          "title": "Sausage Festival",
+          "topic": "the best sausages in town",
+          "author": "weegemans",
+          "body": "Article text body",
           "created_at": 1527695953341
         }
       ]
     }
+  },
+  "GET /api/articles/:articles_id": {
+    "description": "serves an object with an article by id",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "title": "Sausage Festival",
+        "topic": "the best sausages in town",
+        "author": "weegemans",
+        "article_id": 15,
+        "body": "Article text body",
+        "created_at": 1527695953341,
+        "votes": 12,
+        "comment_count": 6
+      }
+    }
+  },
+  "PATCH /api/articles/:articles_id": {
+    "description": "increments or decrements the number votes property by article_id",
+    "request body": { "inc_votes": 5 },
+    "exampleResponse": {
+      "article": {
+        "title": "Sausage Festival",
+        "topic": "the best sausages in town",
+        "author": "weegemans",
+        "article_id": 15,
+        "body": "Article text body",
+        "created_at": 1527695953341,
+        "votes": 17,
+        "comment_count": 6
+      }
+    }
+  },
+  "POST /api/articles/:articles_id/comments": {
+    "description": "Posts a new comment to an article",
+    "request body": {
+      "username": "butter_bridge",
+      "body": "This is a fantastic article"
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 1,
+        "author": "butter_bridge",
+        "article_id": 15,
+        "votes": 0,
+        "created_at": 1527695953341,
+        "body": "This is a fantastic article"
+      }
+    }
+  },
+  "GET /api/articles/:articles_id/comments": {
+    "description": "serves an array of comments for a given article_id",
+    "queries": ["sort_by", "order"],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 1,
+          "author": "butter_bridge",
+          "article_id": 15,
+          "votes": 0,
+          "created_at": 1527695953341,
+          "body": "This is a fantastic article"
+        }
+      ]
+    }
+  },
+  "PATCH /api/comments/:comments_id": {
+    "description": "increments or decrements the number votes property by comments_id",
+    "request body": { "inc_votes": 5 },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 1,
+        "author": "butter_bridge",
+        "article_id": 15,
+        "votes": 10,
+        "created_at": 1527695953341,
+        "body": "This is a fantastic article"
+      }
+    }
+  },
+  "DELETE /api/comments/:comments_id": {
+    "description": "deletes a given comment by comments_id",
+    "exampleResponse": "Response 204 from Server"
   }
 }
