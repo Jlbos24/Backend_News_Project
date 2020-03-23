@@ -55,7 +55,7 @@ describe("/api", () => {
     });
   });
   describe("/users", () => {
-    describe.only("/", () => {
+    describe("/", () => {
       describe("GET", () => {
         it("Status: 200 Get Request responds with all users", () => {
           return request(app)
