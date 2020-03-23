@@ -23,7 +23,7 @@ app.post("/api/articles/:article_id/comments", cors(), function(
 });
 
 app.options("/api/comments/:comment_id", cors());
-request;
+
 app.delete("/api/comments/:comment_id", cors(), function(req, res, next) {
   res.json({ msg: "This is CORS Enabled Comment DELETE" });
 });
