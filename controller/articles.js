@@ -6,7 +6,8 @@ const {
   selectAllArticles,
   verifyAuthor,
   verifyTopic,
-  verifyArticleID
+  verifyArticleID,
+  insertArticle
 } = require("../model/articles.js");
 
 exports.getArticlesByID = (req, res, next) => {
@@ -75,4 +76,15 @@ exports.getAllArticles = (req, res, next) => {
       res.status(200).send({ articles });
     })
     .catch(next);
+};
+exports.postArticle = (req, res, next) => {
+  const newArticle = req.body;
+  insertArticle(newArticle)
+    .then(([article]) => {
+      console.log(article);
+      res.status(201).send({ article });
+    })
+    .catch(error => {
+      console.log(error);
+    });
 };

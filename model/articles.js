@@ -124,3 +124,10 @@ exports.verifyAuthor = author => {
       }
     });
 };
+
+exports.insertArticle = newArticle => {
+  console.log(newArticle, "model");
+  return connection("articles")
+    .insert(newArticle)
+    .returning("*");
+};
