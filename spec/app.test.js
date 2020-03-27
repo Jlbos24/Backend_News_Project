@@ -328,19 +328,54 @@ describe("/api", () => {
             expect(msg).to.equal("Bad Request on Query");
           });
       });
-      describe("INVALID METHOD", () => {
-        it("Status: 405 Invalid Method", () => {
-          const invalidMethods = ["delete", "patch", "put", "post"];
-          const promiseArray = invalidMethods.map(method => {
-            return request(app)
-              [method]("/api/articles")
-              .expect(405)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal("Method Not Allowed");
-              });
+    });
+    describe.only("POST", () => {
+      it("Status: 201 - Post a new article", () => {
+        return request(app)
+          .post("/api/articles/")
+          .send({
+            title: "Creating Articles",
+            body:
+              "Its harder than you think on Tuesday. Day two of my review, debating whether the extra endpoints will help, although based on the requirements of the front end review its seems necessary!!! Oh what to do, guess we already know.",
+            topic: "mitch",
+            author: "lurker"
+          })
+          .expect(201)
+          .then(res => {
+            expect(res.body.article).to.be.an("Object");
+            expect(res.body.article).to.contain.keys(
+              "article_id",
+              "title",
+              "body",
+              "votes",
+              "topic",
+              "author",
+              "created_at"
+            );
+            expect(res.body.article.title).to.eql("Creating Articles");
           });
-          return Promise.all(promiseArray);
+      });
+      xit("Status: 404 - Topic Does Not Exist", () => {
+        return request(app)
+          .post("/api/articles")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad Request on Query");
+          });
+      });
+    });
+    describe("INVALID METHOD", () => {
+      it("Status: 405 Invalid Method", () => {
+        const invalidMethods = ["delete", "patch", "put"];
+        const promiseArray = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/articles")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Method Not Allowed");
+            });
         });
+        return Promise.all(promiseArray);
       });
     });
     describe("/:articles_id", () => {
@@ -698,6 +733,7 @@ describe("/api", () => {
       });
     });
   });
+
   describe("/comments", () => {
     describe("/:comment_id", () => {
       describe("PATCH", () => {
