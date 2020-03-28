@@ -56,12 +56,10 @@ exports.getCommentsByArtID = (req, res, next) => {
 
   return Promise.all(promiseArray)
     .then(([comments]) => {
-     
       res.status(200).send({ comments });
     })
     .catch(next);
-
-
+};
 exports.getAllArticles = (req, res, next) => {
   const { sort_by, order, author, topic } = req.query;
 
@@ -82,6 +80,7 @@ exports.getAllArticles = (req, res, next) => {
     })
     .catch(next);
 };
+
 exports.postArticle = (req, res, next) => {
   const newArticle = req.body;
   insertArticle(newArticle)
