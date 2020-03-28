@@ -76,11 +76,7 @@ exports.selectCommentsByID = (article_id, sort_by, order) => {
     .select("*")
     .where("article_id", "=", article_id)
     .orderBy(sort_by || "created_at", order || "desc")
-    .then(row => {
-      if (row.length == 0) {
-        return Promise.reject({ status: 404, msg: "ID Does Not Exist" });
-      } else return row;
-    });
+    .returning("*");
 };
 
 exports.selectAllArticles = (sort_by, order, author, topic) => {

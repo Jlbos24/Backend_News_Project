@@ -329,7 +329,7 @@ describe("/api", () => {
           });
       });
     });
-    describe.only("POST", () => {
+    describe("POST", () => {
       it("Status: 201 - Post a new article", () => {
         return request(app)
           .post("/api/articles/")
@@ -605,7 +605,6 @@ describe("/api", () => {
                 expect(msg).to.equal("Bad Request");
               });
           });
-
           it("Status: 400 Bad Article ID - PSQL ERROR", () => {
             return request(app)
               .post("/api/articles/invalid_type_id/comments")
@@ -631,7 +630,7 @@ describe("/api", () => {
               });
           });
         });
-        describe("GET", () => {
+        describe.only("GET", () => {
           it("Status: 200 - Retrieve Comments by Article ID", () => {
             return request(app)
               .get("/api/articles/1/comments")
@@ -711,7 +710,7 @@ describe("/api", () => {
               .get("/api/articles/9999/comments")
               .expect(404)
               .then(({ body: { msg } }) => {
-                expect(msg).to.equal("ID Does Not Exist");
+                expect(msg).to.equal("Article Does Not Exist");
               });
           });
 

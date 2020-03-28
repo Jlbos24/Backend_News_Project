@@ -49,13 +49,18 @@ exports.postCommentByArtID = (req, res, next) => {
 exports.getCommentsByArtID = (req, res, next) => {
   const { article_id } = req.params;
   const { sort_by, order } = req.query;
+  const promiseArray = [];
 
-  selectCommentsByID(article_id, sort_by, order)
-    .then(comments => {
+  promiseArray.push(selectCommentsByID(article_id, sort_by, order));
+  promiseArray.push(verifyArticleID(article_id));
+
+  return Promise.all(promiseArray)
+    .then(([comments]) => {
+     
       res.status(200).send({ comments });
     })
     .catch(next);
-};
+
 
 exports.getAllArticles = (req, res, next) => {
   const { sort_by, order, author, topic } = req.query;
@@ -81,10 +86,7 @@ exports.postArticle = (req, res, next) => {
   const newArticle = req.body;
   insertArticle(newArticle)
     .then(([article]) => {
-      console.log(article);
       res.status(201).send({ article });
     })
-    .catch(error => {
-      console.log(error);
-    });
+    .catch(error => {});
 };
