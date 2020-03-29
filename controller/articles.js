@@ -7,7 +7,8 @@ const {
   verifyAuthor,
   verifyTopic,
   verifyArticleID,
-  insertArticle
+  insertArticle,
+  delArticle
 } = require("../model/articles.js");
 
 exports.getArticlesByID = (req, res, next) => {
@@ -83,9 +84,29 @@ exports.getAllArticles = (req, res, next) => {
 
 exports.postArticle = (req, res, next) => {
   const newArticle = req.body;
-  insertArticle(newArticle)
+  let { topic, author } = req.body;
+  const promiseArticles = [];
+
+  promiseArticles.push(insertArticle(newArticle));
+  if (topic) {
+    promiseArticles.push(verifyTopic(topic));
+  }
+  if (author) {
+    promiseArticles.push(verifyAuthor(author));
+  }
+
+  return Promise.all(promiseArticles)
     .then(([article]) => {
-      res.status(201).send({ article });
+      res.status(201).send({ article: article[0] });
     })
-    .catch(error => {});
+    .catch(next);
+};
+
+exports.deleteArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  delArticle(article_id)
+    .then(() => {
+      res.sendStatus(204);
+    })
+    .catch(next);
 };

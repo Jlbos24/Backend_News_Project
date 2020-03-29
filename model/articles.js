@@ -122,8 +122,21 @@ exports.verifyAuthor = author => {
 };
 
 exports.insertArticle = newArticle => {
-  console.log(newArticle, "model");
   return connection("articles")
     .insert(newArticle)
     .returning("*");
+};
+
+exports.delArticle = article_id => {
+  return connection("articles")
+    .where("article_id", "=", article_id)
+    .del()
+    .then(delCount => {
+      if (delCount === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Delete Unsuccessful - ID Not Found"
+        });
+      }
+    });
 };

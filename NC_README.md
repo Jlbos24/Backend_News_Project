@@ -392,12 +392,16 @@ Should accept the following queries:
 #### More Routes
 
 ```http
-POST /api/articles
+DONE - - POST /api/articles
 
-DELETE /api/articles/:article_id
+
+DONE - - DELETE /api/articles/:article_id
 
 POST /api/topics
 
-POST /api/users
-GET /api/users
+    tableBuilder.string("slug", [1000]).primary();
+    tableBuilder.string("description").notNullable();
+
+DONE - - POST /api/users
+DONE - - GET /api/users
 ```
