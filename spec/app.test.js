@@ -39,8 +39,8 @@ describe("/api", () => {
           });
       });
     });
-    describe.only("POST", () => {
-      it.only("Status: 201 - Post a new topic", () => {
+    describe("POST", () => {
+      it("Status: 201 - Post a new topic", () => {
         return request(app)
           .post("/api/topics/")
           .send({
@@ -56,7 +56,7 @@ describe("/api", () => {
       });
       it("Status: 400 - No Data Passed in Body", () => {
         return request(app)
-          .post("/api/articles/")
+          .post("/api/topics/")
           .send()
           .expect(400)
           .then(({ body: { msg } }) => {
@@ -65,61 +65,25 @@ describe("/api", () => {
       });
       it("Status: 400 - Incorrect Keys Passed from Client", () => {
         return request(app)
-          .post("/api/articles/")
+          .post("/api/topics/")
           .send({
-            invalidKey: "Creating Articles",
-            body:
-              "Its harder than you think on Tuesday. Day two of my review, debating whether the extra endpoints will help, although based on the requirements of the front end review its seems necessary!!! Oh what to do, guess we already know.",
-            topic: "mitch",
-            author: "lurker"
+            invalidKey: "Slug?",
+            description: "What are slugs"
           })
           .expect(400)
           .then(({ body: { msg } }) => {
             expect(msg).to.equal("Bad Request");
           });
       });
-      it("Status: 400 - When Passed Missing Key/Value Pair - Missing Author Key", () => {
+      it("Status: 400 - When Passed Missing Key/Value Pair - Missing Description Key", () => {
         return request(app)
-          .post("/api/articles/")
+          .post("/api/topics/")
           .send({
-            title: "Creating Articles",
-            body:
-              "Its harder than you think on Tuesday. Day two of my review, debating whether the extra endpoints will help, although based on the requirements of the front end review its seems necessary!!! Oh what to do, guess we already know.",
-            topic: "mitch"
+            slug: "Slug?"
           })
           .expect(400)
           .then(({ body: { msg } }) => {
             expect(msg).to.equal("Bad Request");
-          });
-      });
-      it("Status: 404 - Topic Does Not Exist", () => {
-        return request(app)
-          .post("/api/articles")
-          .send({
-            title: "Creating Articles",
-            body:
-              "Its harder than you think on Tuesday. Day two of my review, debating whether the extra endpoints will help, although based on the requirements of the front end review its seems necessary!!! Oh what to do, guess we already know.",
-            topic: "notatopic",
-            author: "lurker"
-          })
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Bad Request on Query");
-          });
-      });
-      it("Status: 404 - Author/User Does Not Exist", () => {
-        return request(app)
-          .post("/api/articles")
-          .send({
-            title: "Creating Articles",
-            body:
-              "Its harder than you think on Tuesday. Day two of my review, debating whether the extra endpoints will help, although based on the requirements of the front end review its seems necessary!!! Oh what to do, guess we already know.",
-            topic: "mitch",
-            author: "notanauthor"
-          })
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Bad Request on Query");
           });
       });
     });

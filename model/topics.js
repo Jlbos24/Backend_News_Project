@@ -5,3 +5,8 @@ exports.selectAllTopics = () => {
     .select("slug", "description")
     .returning("*");
 };
+exports.insertTopic = newTopic => {
+  return connection("topics")
+    .insert(newTopic)
+    .returning("*");
+};
