@@ -10,7 +10,19 @@
       "topics": [{ "slug": "Pandemics", "description": "World Response" }]
     }
   },
-
+  "POST /api/topics/": {
+    "description": "Posts a new topic",
+    "request body": {
+      "slug": "Endpoints",
+      "description": "How to create endpoints with express"
+    },
+    "exampleResponse": {
+      "article": {
+        "slug": "Endpoints",
+        "description": "How to create endpoints with express"
+      }
+    }
+  },
   "GET /api/users/:id": {
     "description": "serves an object with a users details",
     "queries": [],
@@ -71,6 +83,26 @@
       ]
     }
   },
+  "POST /api/articles/": {
+    "description": "Posts a new article",
+    "request body": {
+      "title": "Creating Articles",
+      "body": "Its harder than you think on Tuesday night to write another article",
+      "topic": "coding",
+      "author": "lurker"
+    },
+    "exampleResponse": {
+      "article": {
+        "article_id": 10,
+        "title": "Creating Articles",
+        "body": "Its harder than you think on Tuesday night to write another article",
+        "votes": 0,
+        "topic": "coding",
+        "author": "lurker",
+        "created_at": 1527695953341
+      }
+    }
+  },
   "GET /api/articles/:articles_id": {
     "description": "serves an object with an article by id",
     "queries": [],
@@ -102,6 +134,10 @@
         "comment_count": 6
       }
     }
+  },
+  "DELETE /api/articles/:articles_id": {
+    "description": "deletes an article by id",
+    "exampleResponse": "Response 204 from Server"
   },
   "POST /api/articles/:articles_id/comments": {
     "description": "Posts a new comment to an article",

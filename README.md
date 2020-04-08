@@ -1,8 +1,8 @@
 # NC News
+
 ## What is it?
 
 NC-News is an API written in JavaScript sinle page application with various endpoints that will display news articles, comments and topics. It will allow you to create a user, add comments and filter with queries.
-
 
 # News App Back_end
 
@@ -19,33 +19,34 @@ The code can be cloned from GitHub.
 To run this project, please install the following:
 
 ## Dependencies and versions
+
 - dependencies
---chai-sorted: 0.2.0
---express: 4.17.1
---knex: 0.20.10
---pg: 7.18.2
---sams-chai-sorted: 1.0.2
---supertest: 4.0.2
+  --chai-sorted: 0.2.0
+  --express: 4.17.1
+  --knex: 0.20.10
+  --pg: 7.18.2
+  --sams-chai-sorted: 1.0.2
+  --supertest: 4.0.2
 
 - devDependencies
---chai: 4.2.0
---mocha: 7.1.0
-
+  --chai: 4.2.0
+  --mocha: 7.1.0
 
 ### PostGresSQL
 
 #### Mac
+
 Run the following commands in your terminal:
-  - `brew update`
-  - `brew doctor`
-  - `brew install postgresql`
+
+- `brew update`
+- `brew doctor`
+- `brew install postgresql`
 
 #### Ubuntu
 
-Run this command in your terminal:
-  -`sudo apt-get update`
+Run this command in your terminal: -`sudo apt-get update`
 
-  -`sudo apt-get install postgresql postgresql-contrib
+-`sudo apt-get install postgresql postgresql-contrib
 
 ### Knex
 
@@ -79,33 +80,33 @@ const ENV = process.env.NODE_ENV || "development";
 const { DB_URL } = process.env;
 
 const baseConfig = {
-  client: "pg",
-  migrations: {
-    directory: "./db/migrations"
-  },
-  seeds: {
-    directory: "./db/seeds"
-  }
+client: "pg",
+migrations: {
+directory: "./db/migrations"
+},
+seeds: {
+directory: "./db/seeds"
+}
 };
 
 const customConfig = {
-  development: {
-    connection: {
-      database: "nc_news",
-      username: "username",
-      password: "password"
-    }
-  },
-  test: {
-    connection: {
-      database: "nc_news_test",
-      username: "username",
-      password: "password"
-    }
-  },
-  production: {
-    connection: `${DB_URL}?ssl=true`
-  }
+development: {
+connection: {
+database: "nc_news",
+username: "username",
+password: "password"
+}
+},
+test: {
+connection: {
+database: "nc_news_test",
+username: "username",
+password: "password"
+}
+},
+production: {
+connection: `${DB_URL}?ssl=true`
+}
 };
 
 module.exports = { ...customConfig[ENV], ...baseConfig };
@@ -132,17 +133,17 @@ module.exports = { ...customConfig[ENV], ...baseConfig };
 
 #### Run the scripts
 
-_- in the terminal - 
-*npm run setup-dbs 
+\_- in the terminal -
+*npm run setup-dbs
 *npm run migrate-latest:prod
 
 - this will setup the database and create the schema
 
-*npm run seed:prod
+\*npm run seed:prod
 
 - this will set the environment to run in production and seed the database with the development data set
 
-*npm run start
+\*npm run start
 
 - this will initiate the server to run and start receiving requests from the client.
 
@@ -152,22 +153,26 @@ The project has two test specs created, to run project through tests enter the f
 
 for endpoint testing:
 
-*npm test 
+\*npm test
 
 for database manipulation:
 
-*npm test-utils
-
+\*npm test-utils
 
 ### Endpoint Testing
 
 Each endpoint has clearly documented test cases, each covering Invalid Methods, correct data entry and that the code works as intended.
 All testing has been done with mocha chai, and chai packages for some of the sort by methods. SuperTest has been used to test HTTP methods.
 
-#Version
+## Version
 
 Node : v13.2.0
 PostgreSQL: v10.2
 
-#Author
+## Hosting Endpoints
+
+- https://jlb-news-app.herokuapp.com/api/
+
+# Author
+
 Justin Bosman
