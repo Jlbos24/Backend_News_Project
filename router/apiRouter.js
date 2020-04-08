@@ -11,7 +11,7 @@ apiRouter.use("/articles", articlesRouter);
 apiRouter.use("/comments", commentsRouter);
 
 apiRouter.get("/", (req, res, next) => {
-  res.status(200).send(JSON.parse(endpoints));
+  res.status(200).send(endpoints);
 });
 
 module.exports = apiRouter;
